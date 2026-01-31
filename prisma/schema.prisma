@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Docentes {
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  apellido    String
+  email       String    @unique
+  password    String
+  imageUrl    String?   
+  createdAt   DateTime  @default(now())
+  aulaId    Int
+
+  aula      Aulas     @relation(fields: [aulaId], references: [id])
+  estudiantes Estudiante[]
+}
+
+model Aulas {
+  id        Int      @id @default(autoincrement())
+  nombre    String   // Ej: "1ro Básica A"
+
+  docente   Docentes[]
+  estudiantes Estudiante[]
+}
+
+model Estudiante {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellido  String
+  edad      Int
+  imageUrl    String?   
+  createdAt DateTime @default(now())
+
+  docenteId Int
+  aulaId    Int
+  
+  progresoGeneral Float   @default(0) // % de avance (0 - 100)
+  totalPracticas  Int     @default(0)
+  nivelActualId   Int?
+  observacion     String? @db.Text
+
+  docente   Docentes  @relation(fields: [docenteId], references: [id])
+  aula      Aulas     @relation(fields: [aulaId], references: [id])
+  nivelActual Nivel? @relation(fields: [nivelActualId], references: [id])
+}
+
+model Nivel {
+  id        Int     @id @default(autoincrement())
+  nombre    String  // N1, N2, N3
+  descripcion String
+  estudiantes Estudiante[]
+}
+
+model TipoPractica {
+  id        Int     @id @default(autoincrement())
+  nombre    String  @unique // "VOCAL", "PALABRA"
+
+  letras    Letra[]
+  palabras  Palabra[]
+}
+
+model Letra {
+  id              Int     @id @default(autoincrement())
+  caracter        String  // a, e, i, o, u
+  imageUrl        String?
+
+  tipoPracticaId  Int
+  tipoPractica    TipoPractica @relation(fields: [tipoPracticaId], references: [id])
+}
+
+model Palabra {
+  id              Int     @id @default(autoincrement())
+  texto           String  // máx 3 letras
+  longitud        Int
+  imageUrl        String?
+  
+  tipoPracticaId  Int
+  tipoPractica    TipoPractica @relation(fields: [tipoPracticaId], references: [id])
+}
