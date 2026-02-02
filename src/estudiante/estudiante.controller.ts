@@ -48,4 +48,20 @@ export class EstudianteController {
   async sumarPractica(@Param('id', ParseIntPipe) id: number) {
     return this.estudianteService.sumarPractica(id);
   }
+
+  @Get('docente/:docenteId/level/:levelId')
+  findByDocenteAndLevel(
+    @Param('docenteId', ParseIntPipe) docenteId: number,
+    @Param('levelId', ParseIntPipe) levelId: number,
+  ) {
+    return this.estudianteService.findByDocenteAndLevel(docenteId, levelId);
+  }
+
+  @Patch(':id/sumar-progreso/:levelId')
+  async sumarProgreso(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('levelId', ParseIntPipe) levelId: number,
+  ) {
+    return this.estudianteService.sumarProgreso(id, levelId);
+  }
 }

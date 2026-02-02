@@ -95,4 +95,62 @@ export class EstudianteService {
       },
     });
   }
+
+  async findByDocenteAndLevel(docenteId: number, levelId: number) {
+    return this.prisma.estudiante.findMany({
+      where: {
+        docenteId,
+        nivelActualId: levelId,
+      },
+      include: {
+        docente: true,
+        aula: true,
+        nivelActual: true,
+      },
+    });
+  }
+
+  async sumarProgreso(estudianteId: number, levelId: number) {
+    const estudiante = await this.findOne(estudianteId);
+
+    // Si el nivel del estudiante coincide con levelId
+    if (estudiante.nivelActualId === levelId) {
+      let newNivelId = estudiante.nivelActualId;
+      let newProgreso = estudiante.progresoGeneral;
+
+      // Reglas de progreso y niveles
+      switch (estudiante.nivelActualId) {
+        case 1:
+          newNivelId = 2;
+          newProgreso = 15;
+          break;
+        case 2:
+          newNivelId = 3;
+          newProgreso = 35;
+          break;
+        case 3:
+          newProgreso = 100; // no cambia el nivel
+          break;
+        default:
+          // otros niveles no hacen nada
+          return estudiante;
+      }
+
+      return this.prisma.estudiante.update({
+        where: { id: estudianteId },
+        data: {
+          nivelActualId: newNivelId,
+          progresoGeneral: newProgreso,
+        },
+        include: {
+          docente: true,
+          aula: true,
+          nivelActual: true,
+        },
+      });
+    }
+
+    // Si levelId no coincide con nivelActualId, no se hace nada
+    return estudiante;
+  }
 }
