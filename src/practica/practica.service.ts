@@ -37,6 +37,7 @@ export class PracticaService {
   // 🔹 Obtener IDs de letras
   async getIdsLetras() {
     const letras = await this.prisma.letra.findMany({
+      where: {tipoPracticaId: 1},
       select: { id: true },
     });
 
@@ -46,9 +47,19 @@ export class PracticaService {
   // 🔹 Obtener IDs de palabras
   async getIdsPalabras() {
     const palabras = await this.prisma.palabra.findMany({
+      where: {tipoPracticaId: 2},
       select: { id: true },
     });
 
     return palabras.map(p => p.id);
+  }
+
+  async getIdsConsonantes() {
+    const letras = await this.prisma.letra.findMany({
+      where: {tipoPracticaId: 3},
+      select: { id: true },
+    });
+
+    return letras.map(p => p.id);
   }
 }

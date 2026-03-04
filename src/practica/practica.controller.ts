@@ -26,4 +26,8 @@ export class PracticaController {
   getIdsPalabras() {
     return this.practicaService.getIdsPalabras();
   }
-}
+
+  @Get('consonantes/ids')
+  getIdsConsonantes() {
+    return this.practicaService.getIdsConsonantes();
+  }}
